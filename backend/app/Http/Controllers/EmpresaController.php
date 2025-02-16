@@ -14,6 +14,12 @@ class EmpresaController extends Controller
         return view('empresas', ['empresas' => $empresas]);
     }
 
+    public function getEmpresas()
+    {
+        $empresas = Empresa::all();
+        return response()->json($empresas);
+    }
+
     public function create()
     {
         return view('empresas.create');
@@ -22,27 +28,31 @@ class EmpresaController extends Controller
     public function store(Request $request)
     {
         $empresa = new Empresa();
-        $empresa->nombre = $request->name;
+        $empresa->nombre = $request->nombre;
         $empresa->cif = $request->cif;
-        $empresa->telefono = $request->phone;
+        $empresa->telefono = $request->telefono;
         $empresa->email = $request->email;
-        $empresa->direccion_provincia = $request->address['region'];
-        $empresa->poblacion = $request->address['town'];
-        $empresa->direccion_calle = $request->address['street'];
-        $empresa->direccion_lat = $request->address['position']['lat'];
-        $empresa->direccion_lng = $request->address['position']['lng'];
-        $empresa->horario_inicio = $request->workingHours['start'];
-        $empresa->horario_fin = $request->workingHours['end'];
-        $empresa->imagen = $request->image ?? 'https://picsum.photos/300/180';
-        $empresa->categorias = $request->categories;
-        $empresa->servicios = $request->services;
-        $empresa->vacantes_historico = [];
+        $empresa->direccion_provincia = $request->direccion_provincia;
+        $empresa->poblacion = $request->poblacion;
+        $empresa->direccion_calle = $request->direccion_calle;
+        $empresa->direccion_lat = $request->direccion_lat;
+        $empresa->direccion_lng = $request->direccion_lng;
+        $empresa->horario_inicio = $request->horario_inicio;
+        $empresa->horario_fin = $request->horario_fin;
+        $empresa->imagen = $request->imagen ?? 'https://picsum.photos/300/180';
+        $empresa->categorias = $request->categorias;
+        $empresa->servicios = $request->servicios;
+        $empresa->vacantes_historico = [
+            [
+                'year' => $request->input('vacantes_historico.0.year'),
+                'count' => $request->input('vacantes_historico.0.count')
+            ]
+        ];
         $empresa->puntuacion_profesor = 0;
         $empresa->puntuacion_alumno = 0;
         $empresa->save();
 
-        return redirect()->route('empresas.index')
-            ->with('success', 'Empresa creada exitosamente');
+        return redirect()->route('empresas.index')->with('success', 'Empresa creada correctamente');
     }
 
     public function show(Empresa $empresa)

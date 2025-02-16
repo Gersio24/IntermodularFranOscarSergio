@@ -41,5 +41,6 @@ export const routes: Routes = [
   { path: 'form', component: FormComponentComponent},
   //aqui teneis un ejemplo de como se puede hacer el routing con roles, en este caso solo el tutor puede acceder al dashboard, ya sabeis que hay que cambiar los roles por los vuestros
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard], data: {roles: [ 'Centro', 'Tutor' ]} },
+  { path: 'empresa/:id', component: CompanyDetailComponent },
   //{path: '**', component: RouteNotFoundComponent},
 ];

@@ -7,6 +7,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\FormularioController;
 use App\Http\Controllers\PreguntasController;
 use App\Http\Controllers\EmpresaController;
+use App\Http\Controllers\CentroController;
 
 Route::middleware(['auth', 'checkRol:Administrador'])->group(function () {
     Route::get('/', function () {
@@ -37,6 +38,20 @@ Route::middleware(['auth', 'checkRol:Administrador'])->group(function () {
     Route::put('/empresas/{empresa}', [EmpresaController::class, 'update'])->name('empresas.update');
 
     Route::delete('/empresas/{empresa}', [EmpresaController::class, 'destroy'])->name('empresas.destroy');
+
+    Route::get('/centros', [CentroController::class, 'index'])->name('centros.index');
+
+    Route::get('/centros/create', [CentroController::class, 'create'])->name('centros.create');
+
+    Route::post('/centros', [CentroController::class, 'store'])->name('centros.store');
+
+    Route::get('/centros/{centro}', [CentroController::class, 'show'])->name('centros.show');
+
+    Route::get('/centros/{centro}/edit', [CentroController::class, 'edit'])->name('centros.edit');
+
+    Route::put('/centros/{centro}', [CentroController::class, 'update'])->name('centros.update');
+
+    Route::delete('/centros/{centro}', [CentroController::class, 'destroy'])->name('centros.destroy');
 
 });
 

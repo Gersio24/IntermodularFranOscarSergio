@@ -1,5 +1,5 @@
 <div class="row row-cols-1 row-cols-md-3 g-4">
-    @for (company of empresaService.empresasFiltradasOrdenadas(); track company.name) {
-        <app-company [company]="company"></app-company>
+    @for (empresa of empresas; track empresa.name) {
+        <app-company [empresa]="empresa"></app-company>
     }
 </div>
