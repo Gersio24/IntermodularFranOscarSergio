@@ -9,5 +9,5 @@ class RolUsuario extends Model
 {
     use HasFactory;
 
-    protected $table = 'roles_usuarios';
+    protected $table = 'rolesusuarios';
 }

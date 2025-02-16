@@ -9,6 +9,8 @@ class Usuario extends Model
 {
     use HasFactory;
 
+    protected $table = 'usuarios';
+
     public function centro() {
         return $this->belongsTo(Centro::class, 'id_centro');
     }
@@ -16,7 +18,7 @@ class Usuario extends Model
         return $this->belongsTo(Empresa::class, 'id_empresa');
     }
     public function roles() {
-        return $this->belongsToMany(Rol::class, 'roles_usuarios');
+        return $this->belongsToMany(Rol::class, 'rolesusuarios', 'id_usuario', 'id_rol');
     }
 
     /**
