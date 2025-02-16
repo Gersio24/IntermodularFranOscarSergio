@@ -1,24 +1,26 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Empresa } from '../types';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-company',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './company.component.html',
   styleUrl: './company.component.scss'
 })
 export class CompanyComponent {
-  @Input() company!: Empresa;
+  @Input() empresa!: Empresa;
 
   constructor(private router: Router) {}
 
   onContact() {
-    this.router.navigate(['/company', this.company.id]);
+    this.router.navigate(['/empresa', this.empresa.id]);
   }
 
-  onForm(){
-    this.router.navigate(['/create-form', this.company.id]);
+  onForm() {
+    this.router.navigate(['/create-form', this.empresa.id]);
   }
 }
 

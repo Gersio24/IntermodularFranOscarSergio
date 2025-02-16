@@ -13,6 +13,9 @@
                     <a class="nav-link" href="{{route('empresas.index')}}">Empresas</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{{route('centros.index')}}">Centros</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{{route('usuarios')}}">Usuarios</a>
                 </li>
             </ul>

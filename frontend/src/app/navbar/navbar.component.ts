@@ -9,91 +9,100 @@ import { AbstractAuthService } from '../services/abstarct-auth.service';
   standalone: true,
   imports: [CommonModule, RouterModule, FormsModule],
   template: `
-  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-    <div class="container">
-      <a class="navbar-brand" routerLink="/">Proyecto intermodular</a>
-
-      @if (!isAuthenticated()) {
-        <form class="d-flex" (ngSubmit)="onLogin()">
-          <input class="form-control me-2" type="text" [(ngModel)]="username" name="username" placeholder="Usuario">
-          <input class="form-control me-2" type="password" [(ngModel)]="password" name="password" placeholder="Contraseña">
-          <button class="btn btn-light" type="submit">Login</button>
-        </form>
-      } @else {
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <a class="nav-link" routerLink="/profile" routerLinkActive="active">Perfil</a>
-            </li>
-            @if (showDashboard()) {
-              <li class="nav-item">
-                <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" routerLink="/solicitud" routerLinkActive="active">Solicitar Alumnos</a>
-              </li>
-            }
-            @if (isAdmin()) {
-                <li class="nav-item">
-                  <a class="nav-link" routerLink="/create-company" routerLinkActive="active">Crear Empresa</a>
-                </li>
-              }
-          </ul>
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <span class="nav-link">{{authService.username()}}</span>
-            </li>
-            <li class="nav-item">
-              <button class="btn btn-light" (click)="onLogout()">Cerrar sesión</button>
-            </li>
-          </ul>
+    <nav class="navbar">
+      <div class="container d-flex justify-content-end">
+        <div class="button-group">
+          <span class="username">{{getUserName()}}</span>
+          <button class="btn-small" (click)="onLogout()">Cerrar sesión</button>
         </div>
+      </div>
+    </nav>
+  `,
+  styles: [`
+    .navbar {
+      background-color: white;
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
+    }
+
+    .container {
+      width: 100%;
+      padding-right: 15px;
+      padding-left: 15px;
+      margin-right: auto;
+      margin-left: auto;
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .button-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .username {
+      font-size: 14px;
+      color: #666;
+      padding: 4px 8px;
+      background-color: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .btn-small {
+      font-size: 14px;
+      padding: 4px 12px;
+      border: none;
+      border-radius: 4px;
+      background: linear-gradient(to right, #F12711, #F5AF19);
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: linear-gradient(to right, #F5AF19, #F12711);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
-    </div>
-  </nav>
-`
+    }
+  `]
 })
 export class NavbarComponent {
-  username = '';
-  password = '';
-
   constructor(
     public authService: AbstractAuthService,
     private router: Router
   ) {}
 
-  isAuthenticated = computed(() => !!this.authService.username());
-
-  showDashboard = computed(() => {
-    const role = this.authService.role();
-    return role === 'teacher' || role === 'admin';
-  });
-
-  isAdmin = computed(() => this.authService.role() === 'admin');
-
-
-  onLogin() {
-    if (this.username && this.password) {
-      this.authService.login(this.username, this.password).subscribe({
-        next: () => {
-          this.username = '';
-          this.password = '';
-          this.router.navigate(['/profile']);
-        },
-        error: (error) => {
-          console.error('Error en login:', error);
-          alert('Error en el login. Por favor, inténtalo de nuevo.');
-        }
-      });
+  getUserName(): string {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return user.nombre || 'Usuario';
+      } catch (e) {
+        console.error('Error parsing user from localStorage:', e);
+        return 'Usuario';
+      }
     }
+    return 'Usuario';
   }
 
+  isAuthenticated = computed(() => {
+    return !!localStorage.getItem('user');
+  });
+
   onLogout() {
+    console.log('Logout clicked');
+    localStorage.removeItem('user');
     this.authService.logout().subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        console.log('Logout successful');
+        this.router.navigate(['/logout']);
       },
-      error: (error) => console.error('Error en logout:', error)
+      error: (error) => {
+        console.error('Error en logout:', error);
+      }
     });
   }
 }
