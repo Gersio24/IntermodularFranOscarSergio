@@ -21,3 +21,4 @@ export class CompanyComponent {
     this.router.navigate(['/create-form', this.company.id]);
   }
 }
+

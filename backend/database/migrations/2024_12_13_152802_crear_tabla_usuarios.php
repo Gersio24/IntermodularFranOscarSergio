@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('usuarios', function(BluePrint $tabla) {
+        Schema::create('users', function(BluePrint $tabla) {
             $tabla->id();
             $tabla->string('nombre');
             $tabla->string('NIF')->unique();
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('usuarios');
+        Schema::dropIfExists('users');
     }
 };

@@ -18,7 +18,7 @@ return new class extends Migration
             $tabla->timestamps();
 
             $tabla->foreign('id_rol')->references('id')->on('roles')->onDelete('cascade');
-            $tabla->foreign('id_usuario')->references('id')->on('usuarios')->onDelete('cascade');
+            $tabla->foreign('id_usuario')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

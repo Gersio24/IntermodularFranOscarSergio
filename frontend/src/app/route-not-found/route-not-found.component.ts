@@ -8,7 +8,7 @@ import { Component } from '@angular/core';
       <h1>404</h1>
       <h2>Página no encontrada</h2>
       <p>Usted no puede pasar, por tonto</p>
-      <a class="btn btn-primary" href="https://www.youtube.com/watch?v=42CVIuY6nFo" >Volver al inicio</a>
+      <a class="btn btn-primary" href="/" >Volver al inicio</a>
     </div>
   `
 })
