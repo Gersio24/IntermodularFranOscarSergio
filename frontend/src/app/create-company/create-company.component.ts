@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { LocalRegionsService } from '../services/local-regions.service';
 import { HttpCategoriesService } from '../services/http-categories.service';
-import { Region, Category, Company, Service } from '../types';
+import { Region, Category, Empresa, Service } from '../types';
 import { CompanyNameValidatorDirective } from '../directives/company-name-validator.directive';
 import { BusinessHoursValidatorDirective } from '../directives/business-hours-validator.directive';
 
@@ -28,7 +28,7 @@ export class CreateCompanyComponent implements OnInit {
   selectedCategory: string = '';
   errorMsg = '';
 
-  company: Partial<Company> = {
+  company: Partial<Empresa> = {
     name: '',
     phone: '',
     email: '',

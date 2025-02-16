@@ -11,9 +11,20 @@ import { EmpresaFiltrarOrdenarService } from '../services/empresa-orden.service'
   standalone: true,
 })
 export class FiltersComponent {
-  vacantesA: number[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  filtros = {
+    nombre: '',
+    provincia: '',
+    localidad: '',
+    categoria: '',
+    servicio: ''
+  };
 
   constructor(public empresaService: EmpresaFiltrarOrdenarService) {}
+
+  aplicarFiltros(event: Event) {
+    event.preventDefault();
+    this.empresaService.actualizarFiltros({...this.filtros, vacantes: ''});
+  }
 
   onProvinciaSelected(event: Event) {
     const target = event.target as HTMLSelectElement;
@@ -33,25 +44,14 @@ export class FiltersComponent {
     }
   }
 
-  onInputChange(event: Event) {
-    const form = (event.target as HTMLElement).closest('form') as HTMLFormElement;
-    if (!form) return;
-
-    const { nombre, provincia, localidad, vacante, categoria, servicio } = form.elements as FiltrosFormElements;
-
-    this.empresaService.actualizarFiltros({
-      nombre: nombre?.value?.trim() || '',
-      provincia: provincia?.value || '',
-      localidad: localidad?.value || '',
-      vacantes: vacante?.value || '',
-      categoria: categoria?.value || '',
-      servicio: servicio?.value || ''
-    });
-  }
-
   onReset(e: Event) {
-    const form = e.target as HTMLFormElement;
-    form.reset();
+    this.filtros = {
+      nombre: '',
+      provincia: '',
+      localidad: '',
+      categoria: '',
+      servicio: ''
+    };
     
     const regiones = this.empresaService.getRegiones();
     const categorias = this.empresaService.getCategorias();
@@ -64,13 +64,6 @@ export class FiltersComponent {
       this.empresaService.actualizarCategoriaSeleccionada(categorias[0].id);
     }
 
-    this.empresaService.actualizarFiltros({
-      nombre: '',
-      provincia: '',
-      localidad: '',
-      vacantes: '',
-      categoria: '',
-      servicio: ''
-    });
+    this.empresaService.actualizarFiltros({...this.filtros, vacantes: ''});
   }
 }

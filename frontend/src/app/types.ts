@@ -10,64 +10,39 @@ export interface IAuth {
     token: string;
 }
 
-
 export interface Empresa {
-    id: string,
-    name: string,
-    image: string,
-    phone?: string,
-    email?: string,
-    address: {
-        region: string,
-        town: string,
-        street: string
-        position: {
-            lat: number,
-            lng: number,
-        },
-    },
-    openings: Opening[]
-    categories: string[],
-
-    workingHours: {
-        start: string,
-        end: string
-    }
-    score: {
-        teacher: number,
-        student: number
-    }
-}
-
-export interface Company {
-    id: string;
+    id: number;
     name: string;
-    phone: string;
+    cif: string;
     email: string;
+    phone: string;
     address: {
-      region: string;
-      town: string;
-      street: string;
-      position: {
-        lat: number;
-        lng: number;
-      }
+        street: string;
+        region: string;
+        town: string;
+        position: {
+            lat: number;
+            lng: number;
+        }
     };
     workingHours: {
-      start: string;
-      end: string;
+        start: string;
+        end: string;
     };
     image: string;
     categories: string[];
     services: string[];
     openings: {
-      year: number;
-      count: number;
+        year: number;
+        count: number;
     }[];
     score: {
-      teacher: number;
-      student: number;
+        teacher: number;
+        student: number;
     };
+    historicVacancies: any[];
+    teacherScore: number;
+    studentScore: number;
 }
 
 export interface Opening {
@@ -124,6 +99,9 @@ export interface Preguntas{
     tipo: string;
     order: number;
 }
+
+// Añadir alias para Company
+export type Company = Empresa;
 
 
 

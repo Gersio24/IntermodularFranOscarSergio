@@ -3,7 +3,7 @@ import { Directive, Inject } from '@angular/core';
 import { AbstractControl, NG_ASYNC_VALIDATORS, AsyncValidator, ValidationErrors } from '@angular/forms';
 import { Observable, catchError, map, of } from 'rxjs';
 import { API_URL } from '../tokens/api-url.token';
-import { Company } from '../types';
+import { Empresa } from '../types';
 
 @Directive({
   selector: '[company-name-available]',
@@ -18,7 +18,7 @@ export class CompanyNameValidatorDirective implements AsyncValidator {
 
   validate(control: AbstractControl): Observable<ValidationErrors | null> {
     if (!control.value) return of(null);
-    return this.http.get<Company[]>(`${this.apiUrl}/companies`).pipe(
+    return this.http.get<Empresa[]>(`${this.apiUrl}/companies`).pipe(
       map(companies => {
         const exists = companies.some(company => 
           company.name.toLowerCase() === control.value.toLowerCase()
