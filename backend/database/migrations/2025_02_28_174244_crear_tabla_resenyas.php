@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('resenyas', function(BluePrint $tabla) {
             $tabla->id();
             $tabla->date('fecha_resena');
-            $tabla->integer('valoracion');
+            $tabla->string('valoracion');
             $tabla->unsignedBigInteger('id_pregunta_formulario');
             $tabla->timestamps();
 

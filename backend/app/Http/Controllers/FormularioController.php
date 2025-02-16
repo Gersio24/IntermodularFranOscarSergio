@@ -184,11 +184,6 @@ class FormularioController extends Controller
             $fechaActual = date('Y-m-d H:i:s');
 
             foreach ($request->answers as $answer) {
-                // Verificar que la valoración sea numérica
-                if (!is_numeric($answer['respuesta'])) {
-                    continue;
-                }
-
                 // Obtener el id_pregunta_formulario
                 $preguntaFormulario = DB::table('preguntaformulario')
                     ->where('id_pregunta', $answer['pregunta_id'])
@@ -196,9 +191,15 @@ class FormularioController extends Controller
                     ->first();
 
                 if ($preguntaFormulario) {
+                    // Obtener el tipo de pregunta
+                    $tipoPregunta = DB::table('preguntas')
+                        ->where('id', $answer['pregunta_id'])
+                        ->value('tipo');
+
+                    // Guardar la respuesta según el tipo
                     DB::table('resenyas')->insert([
                         'fecha_resena' => $fechaActual,
-                        'valoracion' => intval($answer['respuesta']),
+                        'valoracion' => $answer['respuesta'],
                         'id_pregunta_formulario' => $preguntaFormulario->id
                     ]);
                 }
