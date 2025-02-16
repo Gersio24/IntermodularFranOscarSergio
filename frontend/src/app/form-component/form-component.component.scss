@@ -1,5 +1,5 @@
 .form-container {
-    max-width: 600px;
+    max-width: 800px;
     margin: 0 auto;
     padding: 20px;
   }
@@ -7,36 +7,58 @@
   .question-container {
     margin-bottom: 20px;
   
-    label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: bold;
-    }
-  }
+    .question-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
   
-  .star-rating {
-    .star {
-      font-size: 24px;
-      color: #ddd;
-      cursor: pointer;
-      transition: color 0.2s;
+      label {
+        flex: 1;
+      }
   
-      &:hover,
-      &.selected {
-        color: #ffd700;
+      .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        gap: 5px;
+  
+        label {
+          cursor: pointer;
+          font-size: 24px;
+          color: #ddd;
+          margin: 0;
+          padding: 0;
+          flex: none;
+          width: auto;
+          transition: color 0.2s;
+  
+          &:hover,
+          &:hover ~ label {
+            color: #ffd700;
+          }
+  
+          &.selected {
+            color: #ffd700;
+          }
+  
+          input {
+            display: none;
+          }
+        }
       }
     }
-  }
   
-  textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    resize: vertical;
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
   }
   
   button {
+    margin-top: 20px;
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -45,12 +67,7 @@
     cursor: pointer;
   
     &:disabled {
-      background-color: #cccccc;
-      cursor: not-allowed;
-    }
-  
-    &:hover:not(:disabled) {
-      background-color: #0056b3;
+      background-color: #ccc;
     }
   }
   

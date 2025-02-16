@@ -21,12 +21,12 @@ Route::middleware(['auth', 'checkRol:Administrador'])->group(function () {
 });
 
 Route::middleware('api')->group(function () {
-    // Ruta para obtener preguntas por token
     Route::get('form/preguntas/{token}', [FormularioController::class, 'getPreguntasByToken']);
     
-    // También puedes agrupar las rutas relacionadas con form
     Route::prefix('form')->group(function () {
         Route::get('preguntas/{token}', [FormularioController::class, 'getPreguntasByToken']);
     });
+
+    Route::post('form/respuestas/{token}', [FormularioController::class, 'submitAnswers']);
 });
 

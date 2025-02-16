@@ -25,34 +25,37 @@ export class FormComponentComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Obtener el token de la URL
     this.route.queryParams.subscribe(params => {
       this.token = params['token'];
-      console.log('Token obtenido de URL:', this.token); // Debug
-      
+      console.log('Token recibido:', this.token);
       if (this.token) {
         this.loadFormQuestions();
-      } else {
-        console.error('No se encontró token en la URL');
       }
     });
   }
 
   private loadFormQuestions(): void {
-    if (!this.token) {
-      console.error('Token no disponible');
-      return;
-    }
+    if (!this.token) return;
 
-    this.formService.getFormQuestions(this.token!).subscribe({
+    this.isLoading = true;
+    this.formService.getFormQuestions(this.token).subscribe({
       next: (questions: FormQuestion[]) => {
-        console.log('Preguntas recibidas:', questions);
+        console.log('Preguntas recibidas:', questions.map(q => ({
+          pregunta: q.question,
+          tipo: q.type,
+          tipo_lowercase: q.type?.toLowerCase()
+        })));
+        
         this.questions = questions;
         this.buildForm();
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error al cargar preguntas:', error);
+        this.isLoading = false;
+      },
+      complete: () => {
+        console.log('Petición completada');
         this.isLoading = false;
       }
     });
@@ -66,22 +69,51 @@ export class FormComponentComponent implements OnInit {
     this.form = this.formBuilder.group(group);
   }
 
-  isStarQuestion(type: string): boolean {
-    return type.toLowerCase() === 'star';
+  isStarQuestion(tipo: string): boolean {
+    return tipo?.toLowerCase() === 'estrellas';
   }
 
-  isTextareaQuestion(type: string): boolean {
-    return type.toLowerCase() === 'textarea';
+  isTextareaQuestion(tipo: string): boolean {
+    return tipo.toLowerCase() === 'textarea';
   }
 
-  onStarSelect(questionId: number, value: number): void {
+  onStarClick(questionId: number, value: number): void {
+    console.log('Valor seleccionado:', value);
     this.form.get('question_' + questionId)?.setValue(value);
   }
 
   onSubmit(event: Event): void {
     event.preventDefault();
-    if (this.form.valid) {
-      console.log('Formulario enviado:', this.form.value);
+    if (this.form.valid && this.token) {
+      const answers = Object.keys(this.form.value).map(key => {
+        const questionId = key.replace('question_', '');
+        return {
+          pregunta_id: parseInt(questionId),
+          respuesta: this.form.value[key].toString()
+        };
+      }).filter(answer => answer.respuesta !== '');
+
+      console.log('Enviando datos:', {
+        token: this.token,
+        answers: answers
+      });
+
+      this.formService.submitFormAnswers(this.token, answers).subscribe({
+        next: (response) => {
+          console.log('Éxito:', response);
+          alert('Formulario enviado correctamente');
+        },
+        error: (error) => {
+          console.error('Error detallado:', {
+            status: error.status,
+            statusText: error.statusText,
+            error: error.error,
+            message: error.message,
+            url: error.url
+          });
+          alert(`Error al enviar el formulario: ${error.status} ${error.statusText}`);
+        }
+      });
     }
   }
 }

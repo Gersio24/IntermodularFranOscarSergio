@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { FormQuestion } from '../interfaces/form-question.interface';
 import { environment } from '../../environments/environment';
 
@@ -9,19 +10,28 @@ import { environment } from '../../environments/environment';
 export class FormService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
-    console.log('API URL:', this.apiUrl); // Debug
+  constructor(private http: HttpClient) {}
+
+  getFormQuestions(token: string): Observable<FormQuestion[]> {
+    const url = `${this.apiUrl}/form/preguntas/${token}`;
+    return this.http.get<FormQuestion[]>(url);
   }
 
-  getFormQuestions(token: string | null) {
-    if (!token) {
-      console.error('Token no proporcionado');
-      return;
-    }
+  submitFormAnswers(token: string, answers: any[]): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    });
+
+    const body = { answers: answers };
     
-    const url = `${this.apiUrl}/form/preguntas/${token}`;
-    console.log('Realizando petición a:', url); // Debug
-    
-    return this.http.get<FormQuestion[]>(url);
+    console.log('URL:', `${this.apiUrl}/form/respuestas/${token}`);
+    console.log('Datos enviados:', body);
+
+    return this.http.post(
+      `${this.apiUrl}/form/respuestas/${token}`, 
+      body,
+      { headers }
+    );
   }
 }

@@ -1,27 +1,39 @@
 <div class="form-container">
-  <div *ngIf="isLoading">
-    Cargando preguntas...
-  </div>
+  <div *ngIf="isLoading">Cargando...</div>
 
-  <form *ngIf="!isLoading && form" [formGroup]="form" (ngSubmit)="onSubmit($event)">
+  <form *ngIf="!isLoading && questions.length > 0" [formGroup]="form" (ngSubmit)="onSubmit($event)">
     <div *ngFor="let question of questions" class="question-container">
-      <div *ngIf="isStarQuestion(question.type)">
-        <label>{{ question.question }}</label>
-        <div class="stars">
-          <span *ngFor="let star of [1,2,3,4,5]" 
-                (click)="onStarSelect(question.id, star)"
-                [class.selected]="form.get('question_' + question.id)?.value >= star">
-            ⭐
-          </span>
+      <div class="question-row">
+        <label>{{question.question}}</label>
+        
+        <div *ngIf="isStarQuestion(question.type)" class="rating">
+          <label [class.selected]="form.get('question_' + question.id)?.value >= 5">
+            <input type="radio" [name]="'question_' + question.id" [value]="5" (click)="onStarClick(question.id, 5)">★
+          </label>
+          <label [class.selected]="form.get('question_' + question.id)?.value >= 4">
+            <input type="radio" [name]="'question_' + question.id" [value]="4" (click)="onStarClick(question.id, 4)">★
+          </label>
+          <label [class.selected]="form.get('question_' + question.id)?.value >= 3">
+            <input type="radio" [name]="'question_' + question.id" [value]="3" (click)="onStarClick(question.id, 3)">★
+          </label>
+          <label [class.selected]="form.get('question_' + question.id)?.value >= 2">
+            <input type="radio" [name]="'question_' + question.id" [value]="2" (click)="onStarClick(question.id, 2)">★
+          </label>
+          <label [class.selected]="form.get('question_' + question.id)?.value >= 1">
+            <input type="radio" [name]="'question_' + question.id" [value]="1" (click)="onStarClick(question.id, 1)">★
+          </label>
         </div>
       </div>
 
       <div *ngIf="isTextareaQuestion(question.type)">
-        <label>{{ question.question }}</label>
         <textarea [formControlName]="'question_' + question.id"></textarea>
       </div>
     </div>
 
     <button type="submit" [disabled]="!form.valid">Enviar</button>
   </form>
+
+  <div *ngIf="!isLoading && questions.length === 0">
+    No hay preguntas disponibles
+  </div>
 </div>

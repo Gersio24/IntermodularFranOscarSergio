@@ -14,10 +14,12 @@ use Illuminate\Support\Facades\Log;
 
 class FormularioController extends Controller
 {
+    // Mostrar todos los formularios
     public function index()
     {
-        $formulario = Formulario::with('preguntas')->get();
-        return view("formRese", compact('formulario'));
+        // Traemos todos los formularios con sus preguntas
+        $formularios = Formulario::with('preguntas')->get();
+        return view("formRese", compact('formularios'));
     }
 
     public function show(Request $request)
@@ -25,53 +27,63 @@ class FormularioController extends Controller
         return Formulario::find($request->get('token'));
     }
 
+    // Guardar un nuevo formulario
     public function store(Request $request)
     {
-        // Creación del token para empresa
-        $token = new Token();
-        $token->token = $token->createToken('token_form');
-        $token->save();
+        try {
+            // Creación del token para empresa
+            $token = new Token();
+            $token->token = $token->createToken('token_form');
+            $token->save();
 
-        // Creación del token para alumno
-        $token_a = new Token();
-        $token_a->token = $token_a->createToken('token_form');
-        $token_a->save();
+            // Creación del token para alumno
+            $token_a = new Token();
+            $token_a->token = $token_a->createToken('token_form');
+            $token_a->save();
 
-        // Creación del formulario de empresa
-        $formulario = new Formulario();
-        $formulario->nombre = $request->get('nombre');
-        $formulario->definicion = 'Formulario para la empresa '.$request->get('nombre');
-        $formulario->tipo = 'empresa';
-        $formulario->id_token = $token['id'];
-        $formulario->save();
+            // Creación del formulario de empresa
+            $formulario = new Formulario();
+            $formulario->nombre = $request->get('nombre');
+            $formulario->definicion = 'Formulario para la empresa '.$request->get('nombre');
+            $formulario->tipo = 'empresa';
+            $formulario->id_token = $token['id'];
+            $formulario->save();
 
-        // Creación del formulario del alumno
-        $formulario_a = new Formulario();
-        $formulario_a->nombre = 'Alumno de '.$request->get('nombre');
-        $formulario_a->definicion = 'Formulario para el alumno de la empresa '.$request->get('nombre');
-        $formulario_a->tipo = 'alumno';
-        $formulario_a->id_token = $token_a['id'];
-        $formulario_a->save();
+            // Creación del formulario del alumno
+            $formulario_a = new Formulario();
+            $formulario_a->nombre = 'Alumno de '.$request->get('nombre');
+            $formulario_a->definicion = 'Formulario para el alumno de la empresa '.$request->get('nombre');
+            $formulario_a->tipo = 'alumno';
+            $formulario_a->id_token = $token_a['id'];
+            $formulario_a->save();
 
-        // Asignación de las preguntas del formulario de la empresa (order = 1)
-        $preguntas = Pregunta::All()->where('order', 1);
-        foreach($preguntas as $pregunta){
-            $pregunta_formulario = new PreguntaFormulario();
-            $pregunta_formulario->id_formulario = $formulario['id'];
-            $pregunta_formulario->id_pregunta = $pregunta['id'];
-            $pregunta_formulario->save();
+            // Asignación de las preguntas del formulario de la empresa (order = 1)
+            $preguntas = Pregunta::All()->where('order', 1);
+            foreach($preguntas as $pregunta){
+                $pregunta_formulario = new PreguntaFormulario();
+                $pregunta_formulario->id_formulario = $formulario['id'];
+                $pregunta_formulario->id_pregunta = $pregunta['id'];
+                $pregunta_formulario->save();
+            }
+
+            // Asignación de las preguntas del formulario del alumno (order = 2)
+            $preguntas_a = Pregunta::All()->where('order', 2);
+            foreach($preguntas_a as $pregunta){
+                $pregunta_formulario = new PreguntaFormulario();
+                $pregunta_formulario->id_formulario = $formulario_a['id'];
+                $pregunta_formulario->id_pregunta = $pregunta['id'];
+                $pregunta_formulario->save();
+            }
+
+            $empresas = Empresa::paginate(10);
+            return view('/empresas', compact(['empresas', 'token', 'token_a']))->with('success', 'Formularios creados correctamente');
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'mensaje' => 'No pude guardar el formulario :(',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Asignación de las preguntas del formulario del alumno (order = 2)
-        $preguntas_a = Pregunta::All()->where('order', 2);
-        foreach($preguntas_a as $pregunta){
-            $pregunta_formulario = new PreguntaFormulario();
-            $pregunta_formulario->id_formulario = $formulario_a['id'];
-            $pregunta_formulario->id_pregunta = $pregunta['id'];
-            $pregunta_formulario->save();
-        }
-        $empresas = Empresa::paginate(10);
-        return view('/empresas', compact(['empresas', 'token', 'token_a']))->with('success', 'Formularios creados correctamente');
     }
 
     public function update(Request $request, $id)
@@ -88,66 +100,122 @@ class FormularioController extends Controller
         return 204;
     }
 
+    // Obtener preguntas por token
     public function getPreguntasByToken($token)
     {
-        Log::info('Token recibido:', ['token' => $token]);
-
         try {
-            // 1. Primero verificamos si el formulario existe
-            $formulario = DB::table('formularios')
-                ->where('id_token', $token)
-                ->first();
+            $tokenData = DB::select("SELECT * FROM tokens WHERE token = ?", [$token]);
 
-            if (!$formulario) {
-                Log::warning('Formulario no encontrado:', ['token' => $token]);
+            if (empty($tokenData)) {
                 return response()->json([
-                    'message' => 'Formulario no encontrado',
+                    'message' => 'Token no encontrado',
                     'token' => $token
                 ], 404);
             }
 
-            Log::info('Formulario encontrado:', ['formulario_id' => $formulario->id]);
+            $tokenData = $tokenData[0];
+            
+            $formulario = DB::table('formularios')
+                ->where('id_token', $tokenData->id)
+                ->first();
 
-            // 2. Obtenemos las preguntas
-            $preguntas = DB::table('preguntas AS p')
-                ->join('preguntaformulario AS pf', 'p.id', '=', 'pf.id_pregunta')
-                ->join('formularios AS f', 'pf.id_formulario', '=', 'f.id')
-                ->where('f.id', $formulario->id) // Cambiado para usar el ID del formulario
-                ->select(
-                    'p.id',
-                    'p.pregunta as question',
-                    'p.tipo as type',
-                    'pf.id as pregunta_formulario_id'
-                )
-                ->get();
-
-            Log::info('Consulta SQL:', [
-                'query' => DB::getQueryLog(),
-                'numero_preguntas' => $preguntas->count()
-            ]);
-
-            if ($preguntas->isEmpty()) {
-                Log::warning('No se encontraron preguntas para el formulario');
+            if (!$formulario) {
                 return response()->json([
-                    'message' => 'No hay preguntas asociadas a este formulario'
+                    'message' => 'Formulario no encontrado',
+                    'token_id' => $tokenData->id
                 ], 404);
             }
 
-            return response()->json([
-                'status' => 'success',
-                'data' => $preguntas
-            ], 200);
+            $preguntas = DB::table('preguntas as p')
+                ->select(
+                    'p.id',
+                    'p.titulo as question',
+                    'p.tipo as type',
+                    'pf.id as pregunta_formulario_id'
+                )
+                ->join('preguntaformulario as pf', 'p.id', '=', 'pf.id_pregunta')
+                ->join('formularios as f', 'pf.id_formulario', '=', 'f.id')
+                ->where('f.id', $formulario->id)
+                ->get();
+
+            return response()->json($preguntas);
 
         } catch (\Exception $e) {
-            Log::error('Error en getPreguntasByToken:', [
-                'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'file' => $e->getFile()
-            ]);
+            return response()->json([
+                'message' => 'Error en el servidor',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getQuestionsByToken($token)
+    {
+        $formulario = Formulario::where('token', $token)->firstOrFail();
+        $preguntas = $formulario->preguntas()->get();
+        
+        return response()->json($preguntas);
+    }
+
+    public function submitAnswers($token, Request $request)
+    {
+        try {
+            $tokenData = DB::table('tokens')
+                ->where('token', $token)
+                ->first();
+
+            if (!$tokenData) {
+                return response()->json([
+                    'message' => 'Token no encontrado',
+                    'token' => $token
+                ], 404);
+            }
+
+            $formulario = DB::table('formularios')
+                ->where('id_token', $tokenData->id)
+                ->first();
+
+            if (!$formulario) {
+                return response()->json([
+                    'message' => 'Formulario no encontrado',
+                    'token_id' => $tokenData->id
+                ], 404);
+            }
+
+            $fechaActual = date('Y-m-d H:i:s');
+
+            foreach ($request->answers as $answer) {
+                // Verificar que la valoración sea numérica
+                if (!is_numeric($answer['respuesta'])) {
+                    continue;
+                }
+
+                // Obtener el id_pregunta_formulario
+                $preguntaFormulario = DB::table('preguntaformulario')
+                    ->where('id_pregunta', $answer['pregunta_id'])
+                    ->where('id_formulario', $formulario->id)
+                    ->first();
+
+                if ($preguntaFormulario) {
+                    DB::table('resenyas')->insert([
+                        'fecha_resena' => $fechaActual,
+                        'valoracion' => intval($answer['respuesta']),
+                        'id_pregunta_formulario' => $preguntaFormulario->id
+                    ]);
+                }
+            }
 
             return response()->json([
-                'message' => 'Error al obtener las preguntas',
-                'error' => $e->getMessage()
+                'message' => 'Reseñas guardadas correctamente'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al guardar las reseñas',
+                'error' => $e->getMessage(),
+                'data' => [
+                    'fecha' => $fechaActual,
+                    'request' => $request->all()
+                ]
             ], 500);
         }
     }
