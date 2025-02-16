@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
 =======
         $this->call(preguntasSeeder::class);
       
-        Empresa::factory(10)->create();
+        Empresa::factory(50)->create();
         Centro::factory(10)->create();
         User::factory(50)->create();
 

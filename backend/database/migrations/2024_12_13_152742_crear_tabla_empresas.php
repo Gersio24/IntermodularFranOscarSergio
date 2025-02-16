@@ -11,27 +11,26 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('empresas', function(BluePrint $tabla) {
+        Schema::create('empresas', function(Blueprint $tabla) {
             $tabla->id();
             $tabla->string('nombre');
             $tabla->string('cif')->unique();
-            $tabla->string('descripcion');
-            $tabla->string('imagen');
-            $tabla->string('notas');
+            $tabla->string('telefono');
             $tabla->string('email')->unique();
             $tabla->string('direccion_calle');
             $tabla->string('direccion_provincia');
-            $tabla->float('direccion_lat');
-            $tabla->float('direccion_log');
-            $tabla->string('provincia');
             $tabla->string('poblacion');
-            $tabla->integer('vacantes');
-            $tabla->string('horario_inicio');
-            $tabla->string('horario_fin');
-            $tabla->string('password');
+            $tabla->float('direccion_lat');
+            $tabla->float('direccion_lng');
+            $tabla->time('horario_inicio');
+            $tabla->time('horario_fin');
+            $tabla->string('imagen');
+            $tabla->json('categorias');
+            $tabla->json('servicios');
+            $tabla->json('vacantes_historico');
+            $tabla->float('puntuacion_profesor')->default(0);
+            $tabla->float('puntuacion_alumno')->default(0);
             $tabla->timestamps();
-
-
         });
     }
 

@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Empresa>
@@ -19,23 +18,34 @@ class EmpresaFactory extends Factory
     {
         return [
             'nombre' => $this->faker->company(),
-            'cif' => $this->faker->unique()->bothify('A########'), // Simulación de un CIF
-            'descripcion' => $this->faker->sentence(),
-            'imagen' => $this->faker->imageUrl(640, 480, 'business'), // URL de imagen aleatoria
-            'notas' => $this->faker->paragraph(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'cif' => $this->faker->unique()->bothify('B########'),
+            'telefono' => $this->faker->phoneNumber(),
+            'email' => $this->faker->unique()->companyEmail(),
             'direccion_calle' => $this->faker->streetAddress(),
             'direccion_provincia' => $this->faker->state(),
-            'direccion_lat' => $this->faker->latitude(),
-            'direccion_log' => $this->faker->longitude(),
-            'provincia' => $this->faker->state(),
             'poblacion' => $this->faker->city(),
-            'vacantes' => $this->faker->numberBetween(1, 10),
-            'horario_inicio' => $this->faker->time('H:i'),
-            'horario_fin' => $this->faker->time('H:i'),
-            'password' => $this->faker->password(), // Contraseña encriptada
-            'created_at' => now(),
-            'updated_at' => now(),
+            'direccion_lat' => $this->faker->latitude(),
+            'direccion_lng' => $this->faker->longitude(),
+            'horario_inicio' => '08:00',
+            'horario_fin' => '18:00',
+            'imagen' => $this->faker->imageUrl(300, 180),
+            'categorias' => $this->faker->randomElements([
+                'Administración de sistemas',
+                'Administración de empresas',
+                'Programación web'
+            ], rand(1, 3)),
+            'servicios' => $this->faker->randomElements([
+                'Linux', 'Cisco', 'Windows', 'Personal', 'Frontend',
+                'Backend', 'Angular', 'React', 'Vue'
+            ], rand(3, 9)),
+            'vacantes_historico' => [
+                ['year' => 2021, 'count' => rand(1, 10)],
+                ['year' => 2022, 'count' => rand(1, 10)],
+                ['year' => 2023, 'count' => rand(1, 10)],
+                ['year' => 2024, 'count' => rand(1, 10)]
+            ],
+            'puntuacion_profesor' => $this->faker->randomFloat(2, 0, 100),
+            'puntuacion_alumno' => $this->faker->randomFloat(2, 0, 100),
         ];
     }
 }

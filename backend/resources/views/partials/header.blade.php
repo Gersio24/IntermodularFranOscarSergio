@@ -10,7 +10,7 @@
                     <a class="nav-link" href="{{route('admin')}}">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="}}">Empresas</a>
+                    <a class="nav-link" href="{{route('empresas.index')}}">Empresas</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{route('usuarios')}}">Usuarios</a>
